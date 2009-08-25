@@ -96,6 +96,10 @@ module CollectiveIdea #:nodoc:
       end
 
       module InstanceMethods
+        
+        def created_by
+          audits.first.user
+        end
 
         # Temporarily turns off auditing while saving.
         def save_without_auditing

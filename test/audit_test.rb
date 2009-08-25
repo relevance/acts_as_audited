@@ -122,6 +122,19 @@ class AuditTest < Test::Unit::TestCase
       Audit.new(:changes => {:a => [1, 2], :b => [3, 4]}).old_attributes.should == {'a' => 1, 'b' => 3}
     end
   end
+  
+  context "created_by" do
+    should "be the user that first created the object" do
+      creator = User.create :name => "Vishnu"
+      updater = User.create :name => "Light-consumer"
+      
+      company = nil
+      Audit.as_user(creator) { company = Company.create :name => 'The auditors' }
+      company.created_by.should == creator
+      Audit.as_user(updater) { company.update_attribute(:name, "The Auditors, Inc.") }
+      company.audits.collect(&:user).should == [creator, updater]
+    end
+  end
 
   context "as_user" do
     setup do
